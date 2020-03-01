@@ -196,9 +196,9 @@ export class Proxy {
 			}
 			let resData, reqErr;
 			let req = http.request ({
-				host: config.objectum.host,
-				port: config.objectum.port,
-				path: `/projects/${config.database.db}/${query ? `?${query}` : ""}`,
+				host: me.config.objectum.host,
+				port: me.config.objectum.port,
+				path: `/projects/${me.config.database.db}/${query ? `?${query}` : ""}`,
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json; charset=utf-8",
@@ -222,10 +222,6 @@ export class Proxy {
 							if (d.sessionId) {
 								me.sessions [d.sessionId] = d;
 								me.sessions [d.sessionId].username = json.username;
-								
-								resData = JSON.stringify (Object.assign (d, {
-									code: config.code, name: config.name
-								}));
 							}
 						}
 						response.send (resData);
