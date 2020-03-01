@@ -1,0 +1,34 @@
+{
+  "name": "objectum-proxy",
+  "version": "0.1.0",
+  "description": "objectum-proxy",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "es",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "build": "nwb build-web-module",
+    "clean": "nwb clean-module",
+    "prepublishOnly": "npm run build",
+    "test": "nwb test",
+    "test:coverage": "nwb test --coverage",
+    "test:watch": "nwb test --server"
+  },
+  "dependencies": {
+    "express-http-proxy": "^1.6.0",
+    "objectum-client": "^1.1.59"
+  },
+  "devDependencies": {
+    "nwb": "0.23.x"
+  },
+  "author": "Dmitriy Samortsev",
+  "homepage": "https://github.com/objectum/objectum-proxy#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/objectum/objectum-proxy.git"
+  }
+}
