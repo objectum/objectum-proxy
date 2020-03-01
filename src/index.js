@@ -10,7 +10,7 @@ import variables from './cjs.js';
 const {__dirname} = variables;
 //const __dirname = path.join (path.dirname (decodeURI (new URL (import.meta.url).pathname)));
 
-export class Proxy {
+export default class Proxy {
 	constructor () {
 		let me = this;
 		
