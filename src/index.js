@@ -1,9 +1,11 @@
-import path from "path";
+//import path from "path";
 import expressProxy from "express-http-proxy";
 import objectumClient from "objectum-client";
 
 const {Store} = objectumClient;
-const __dirname = path.join (path.dirname (decodeURI (new URL (import.meta.url).pathname)));
+import variables from './cjs.js';
+const {__dirname} = variables;
+//const __dirname = path.join (path.dirname (decodeURI (new URL (import.meta.url).pathname)));
 
 export class Proxy {
 	constructor () {
