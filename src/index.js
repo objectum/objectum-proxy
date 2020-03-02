@@ -6,8 +6,8 @@ import expressProxy from "express-http-proxy";
 import objectumClient from "objectum-client";
 
 const {Store} = objectumClient;
-import variables from './cjs.js';
-const {__dirname} = variables;
+//import variables from './cjs.js';
+//const {__dirname} = variables;
 //const __dirname = path.join (path.dirname (decodeURI (new URL (import.meta.url).pathname)));
 
 export default class Proxy {
@@ -245,7 +245,7 @@ export default class Proxy {
 		this.registered [path] = Cls;
 	}
 	
-	start ({app, config, code}) {
+	start ({app, config, code, dirname}) {
 		let me = this;
 		
 		me.config = config;
@@ -267,9 +267,9 @@ export default class Proxy {
 		app.post (`/${code}`, (req, res) => {
 			me.api (req, res);
 		});
-		app.use (express.static (path.join (__dirname, "build")));
+		app.use (express.static (path.join (dirname, "build")));
 		app.get ("/*", function (req, res) {
-			res.sendFile (path.join (__dirname, "build", "index.html"));
+			res.sendFile (path.join (dirname, "build", "index.html"));
 		});
 		app.listen (config.port, function () {
 			console.log (`server listening on port ${config.port}`);
