@@ -269,9 +269,9 @@ export default class Proxy {
 		me.app.post (`/${code}`, (req, res) => {
 			me.api (req, res);
 		});
-		me.app.use (express.static (path.join (dirname, "build")));
+		me.app.use (express.static (path.join (__dirname, "build")));
 		me.app.get ("/*", function (req, res) {
-			res.sendFile (path.join (dirname, "build", "index.html"));
+			res.sendFile (path.join (__dirname, "build", "index.html"));
 		});
 		me.app.listen (config.port, function () {
 			console.log (`server listening on port ${config.port}`);
