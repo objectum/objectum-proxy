@@ -245,33 +245,35 @@ export default class Proxy {
 		this.registered [path] = Cls;
 	}
 	
-	start ({app, config, code, dirname}) {
+	start ({config, code, __dirname}) {
 		let me = this;
 		
 		me.config = config;
 		
-		app.use (`/${code}/public`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
+		me.app = express ();
+		
+		me.app.use (`/${code}/public`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
 				return `/public/${req.url}`;
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
-		app.use (`/${code}/upload`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
+		me.app.use (`/${code}/upload`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
 				return `/projects/${config.code}/upload${req.url}`;
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
-		app.post (`/${code}`, (req, res) => {
+		me.app.post (`/${code}`, (req, res) => {
 			me.api (req, res);
 		});
-		app.use (express.static (path.join (dirname, "build")));
-		app.get ("/*", function (req, res) {
+		me.app.use (express.static (path.join (dirname, "build")));
+		me.app.get ("/*", function (req, res) {
 			res.sendFile (path.join (dirname, "build", "index.html"));
 		});
-		app.listen (config.port, function () {
+		me.app.listen (config.port, function () {
 			console.log (`server listening on port ${config.port}`);
 		});
 	}
