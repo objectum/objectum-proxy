@@ -1,14 +1,9 @@
-//import path from "path";
 import path from "path";
 import http from "http";
 import express from "express";
 import expressProxy from "express-http-proxy";
 import objectumClient from "objectum-client";
-
 const {Store} = objectumClient;
-//import variables from './cjs.js';
-//const {__dirname} = variables;
-//const __dirname = path.join (path.dirname (decodeURI (new URL (import.meta.url).pathname)));
 
 export default class Proxy {
 	constructor () {
@@ -43,6 +38,7 @@ export default class Proxy {
 				
 				await store.load ();
 				store.informer ();
+				me.store = store;
 			}
 			for (let path in me.registered) {
 				store.register (path, me.registered [path]);
@@ -214,7 +210,7 @@ export default class Proxy {
 						resData = d;
 					}
 				});
-				res.on ("end", function () {
+				res.on ("end", async () => {
 					if (!reqErr) {
 						if (json._fn == "auth") {
 							let d = JSON.parse (resData);
@@ -223,6 +219,9 @@ export default class Proxy {
 								me.sessions [d.sessionId] = d;
 								me.sessions [d.sessionId].username = json.username;
 							}
+						}
+						if ((json._rsc == "model" || json._rsc == "query") && (json._fn == "create" || json._fn == "set")) {
+							await me.store.load ();
 						}
 						response.send (resData);
 					}
