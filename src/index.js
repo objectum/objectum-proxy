@@ -244,28 +244,28 @@ export default class Proxy {
 		this.registered [path] = Cls;
 	}
 	
-	start ({config, code, __dirname}) {
+	start ({config, path, __dirname}) {
 		let me = this;
 		
 		me.config = config;
 		
 		me.app = express ();
 		
-		me.app.use (`/${code}/public`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
+		me.app.use (`${path}/public`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
 				return `/public/${req.url}`;
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
-		me.app.use (`/${code}/upload`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
+		me.app.use (`${path}/upload`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
 				return `/projects/${config.code}/upload${req.url}`;
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
-		me.app.post (`/${code}`, (req, res) => {
+		me.app.post (path, (req, res) => {
 			me.api (req, res);
 		});
 		me.app.use (express.static (path.join (__dirname, "build")));
