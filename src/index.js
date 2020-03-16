@@ -1,4 +1,4 @@
-import path from "path";
+import _path from "path";
 import http from "http";
 import express from "express";
 import expressProxy from "express-http-proxy";
@@ -268,9 +268,9 @@ export default class Proxy {
 		me.app.post (path, (req, res) => {
 			me.api (req, res);
 		});
-		me.app.use (express.static (path.join (__dirname, "build")));
+		me.app.use (express.static (_path.join (__dirname, "build")));
 		me.app.get ("/*", function (req, res) {
-			res.sendFile (path.join (__dirname, "build", "index.html"));
+			res.sendFile (_path.join (__dirname, "build", "index.html"));
 		});
 		me.app.listen (config.port, function () {
 			console.log (`server listening on port ${config.port}`);
