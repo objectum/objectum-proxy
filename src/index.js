@@ -99,7 +99,7 @@ export default class Proxy {
 		let Model = store.registered [mid];
 		
 		if (Model) {
-			let fn = Model._filter;
+			let fn = Model._accessFilter;
 			
 			if (typeof (fn) == "function") {
 				let filter = await me.getFilter ({fn, store, alias});
@@ -143,7 +143,7 @@ export default class Proxy {
 					}
 				}
 			} catch (err) {
-				throw new Error (`_filter.query: ${opts.query}, error: ${err.message}`);
+				throw new Error (`_accessFilter.query: ${opts.query}, error: ${err.message}`);
 			}
 		}
 		return filters;

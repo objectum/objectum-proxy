@@ -1,6 +1,6 @@
 {
   "name": "objectum-proxy",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "objectum-proxy",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -20,7 +20,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-http-proxy": "^1.6.0",
-    "objectum-client": "^1.1.59"
+    "objectum-client": "^1.1.65"
   },
   "devDependencies": {
     "nwb": "0.23.x"
