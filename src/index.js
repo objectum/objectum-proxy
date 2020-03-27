@@ -156,7 +156,7 @@ export default class Proxy {
 		
 		request.on ("data", chunk => {
 			if (data) {
-				data = Buffer.concat (data, chunk);
+				data = Buffer.concat ([data, chunk]);
 			} else {
 				data = chunk;
 			}
