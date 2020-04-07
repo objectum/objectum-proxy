@@ -187,6 +187,7 @@ export default class Proxy {
 						data = JSON.stringify (json);
 					}
 				} catch (err) {
+					console.error (err);
 					return response.send ({error: err.message});
 				}
 			}
