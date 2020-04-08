@@ -169,6 +169,9 @@ export default class Proxy {
 			} catch (err) {
 				return response.send ({error: err.message});
 			}
+			if (json._trace) {
+				json._trace.push (["proxy-start", new Date ().getTime ()]);
+			}
 			if (json._model && json._method) {
 				json.sid = request.query.sid;
 				
@@ -219,6 +222,14 @@ export default class Proxy {
 							if (d.sessionId) {
 								me.sessions [d.sessionId] = d;
 								me.sessions [d.sessionId].username = json.username;
+							}
+						}
+						if (json._trace) {
+							let d = JSON.parse (resData);
+							
+							if (d._trace) {
+								d._trace.push (["proxy-end", new Date ().getTime ()]);
+								resData = JSON.stringify (d);
 							}
 						}
 						if ((json._rsc == "model" || json._rsc == "query") && (json._fn == "create" || json._fn == "set")) {
