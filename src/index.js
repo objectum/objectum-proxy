@@ -171,6 +171,7 @@ export default class Proxy {
 			}
 			if (json._trace) {
 				json._trace.push (["proxy-start", new Date ().getTime ()]);
+				data = JSON.stringify (json);
 			}
 			if (json._model && json._method) {
 				json.sid = request.query.sid;
