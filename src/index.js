@@ -55,6 +55,7 @@ export default class Proxy {
 			let store = await me.getStore (opts.sid);
 			
 			opts.store = store;
+			opts.progress = () => {};
 			
 			if (opts.id) {
 				let record = await store.getRecord (opts.id);
