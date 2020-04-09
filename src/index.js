@@ -63,7 +63,9 @@ export default class Proxy {
 				if (typeof (record [opts._method]) != "function") {
 					return {error: `unknown method: ${opts._method}`};
 				}
-				return await record [opts._method] (opts);
+				let result = await record [opts._method] (opts);
+				
+				return {result};
 			} else {
 				let Model = store.registered [opts._model];
 				
@@ -73,7 +75,9 @@ export default class Proxy {
 				if (typeof (Model [opts._method]) != "function") {
 					return {error: `unknown static method: ${opts._method}`};
 				}
-				return await Model [opts._method] (opts);
+				let result = await Model [opts._method] (opts);
+				
+				return {result};
 			}
 		} catch (err) {
 			return {error: err.message, stack: err.stack.split ("\n")};
