@@ -33,11 +33,12 @@ export default class Proxy {
 				store.map = me.map;
 				store.dict = me.dict;
 			} else {
+				await store.load ();
+				
+				store.informer ();
+				
 				me.map = store.map;
 				me.dict = store.dict;
-				
-				await store.load ();
-				store.informer ();
 				me.store = store;
 			}
 			for (let path in me.registered) {
