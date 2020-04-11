@@ -12,6 +12,8 @@ export default class Proxy {
 		me.registered = {};
 		me.sessions = {};
 		me.pool = {};
+		me.progress = {};
+		me.progressCount = {};
 	}
 	
 	async getStore (sid) {
@@ -54,10 +56,23 @@ export default class Proxy {
 		
 		try {
 			let store = await me.getStore (opts.sid);
+			let progressId = `${opts.id ? opts.id : opts._model}-${opts._method}`;
 			
 			opts.store = store;
-			opts.progress = () => {};
-			
+			opts.progress = ({label, value, max}) => {
+				me.progress [opts.sid] = me.progress [opts.sid] || {};
+				me.progress [opts.sid][progressId] = me.progress [opts.sid][progressId] || {};
+				
+				if (label) {
+					me.progress [opts.sid][progressId].label = label;
+				}
+				if (value) {
+					me.progress [opts.sid][progressId].value = value;
+				}
+				if (max) {
+					me.progress [opts.sid][progressId].max = max;
+				}
+			};
 			if (opts.id) {
 				let record = await store.getRecord (opts.id);
 				
@@ -66,6 +81,11 @@ export default class Proxy {
 				}
 				let result = await record [opts._method] (opts);
 				
+				delete me.progress [opts.sid][progressId];
+				
+				if (!Object.keys (me.progress [opts.sid]).length) {
+					delete me.progress [opts.sid];
+				}
 				return {result};
 			} else {
 				let Model = store.registered [opts._model];
@@ -78,6 +98,11 @@ export default class Proxy {
 				}
 				let result = await Model [opts._method] (opts);
 				
+				delete me.progress [opts.sid][progressId];
+				
+				if (!Object.keys (me.progress [opts.sid]).length) {
+					delete me.progress [opts.sid];
+				}
 				return {result};
 			}
 		} catch (err) {
@@ -201,6 +226,22 @@ export default class Proxy {
 				} catch (err) {
 					console.error (err);
 					return response.send ({error: err.message});
+				}
+			}
+			if (json._fn == "getNews") {
+				if (me.progress [request.query.sid]) {
+					me.progressCount [request.query.sid] = me.progressCount [request.query.sid] || 0;
+					me.progressCount [request.query.sid] ++;
+					
+					if (me.progressCount [request.query.sid] < 5) {
+						return setTimeout (() => {
+							response.send ({
+								progress: me.progress [request.query.sid],
+								revision: json.revision,
+								records: []
+							});
+						}, 1000);
+					}
 				}
 			}
 			let resData, reqErr;
