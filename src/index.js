@@ -13,7 +13,6 @@ export default class Proxy {
 		me.sessions = {};
 		me.pool = {};
 		me.progress = {};
-		me.progressCount = {};
 	}
 	
 	async getStore (sid) {
@@ -228,21 +227,9 @@ export default class Proxy {
 					return response.send ({error: err.message});
 				}
 			}
-			if (json._fn == "getNews") {
-				if (me.progress [request.query.sid]) {
-					me.progressCount [request.query.sid] = me.progressCount [request.query.sid] || 0;
-					me.progressCount [request.query.sid] ++;
-					
-					if (me.progressCount [request.query.sid] < 5) {
-						return setTimeout (() => {
-							response.send ({
-								progress: me.progress [request.query.sid],
-								revision: json.revision,
-								records: []
-							});
-						}, 1000);
-					}
-				}
+			if (json._fn == "getNews" && me.progress [request.query.sid]) {
+				json.progress = 1;
+				data = JSON.stringify (json);
 			}
 			let resData, reqErr;
 			let req = http.request ({
@@ -281,6 +268,12 @@ export default class Proxy {
 								d._trace.push (["proxy-end", new Date ().getTime ()]);
 								resData = JSON.stringify (d);
 							}
+						}
+						if (json._fn == "getNews" && me.progress [request.query.sid]) {
+							let d = JSON.parse (resData);
+							
+							d.progress = me.progress [request.query.sid];
+							resData = JSON.stringify (d);
 						}
 						if ((json._rsc == "model" || json._rsc == "query") && (json._fn == "create" || json._fn == "set")) {
 							await me.store.load ();
