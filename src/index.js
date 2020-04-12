@@ -223,7 +223,7 @@ export default class Proxy {
 			}
 			if (me.progress [request.query.sid]) {
 				if (json._fn == "startTransaction") {
-					return resposne.send ({error: "action in progress"});
+					return response.send ({error: "action in progress"});
 				}
 				if (json._fn == "getNews") {
 					json.progress = 1;
