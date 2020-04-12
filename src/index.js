@@ -97,6 +97,8 @@ export default class Proxy {
 				return {result};
 			}
 		} catch (err) {
+			delete me.progress [opts.sid];
+			
 			return {error: err.message, stack: err.stack.split ("\n")};
 		}
 	}
@@ -219,9 +221,14 @@ export default class Proxy {
 					return response.send ({error: err.message});
 				}
 			}
-			if (json._fn == "getNews" && me.progress [request.query.sid]) {
-				json.progress = 1;
-				data = JSON.stringify (json);
+			if (me.progress [request.query.sid]) {
+				if (json._fn == "startTransaction") {
+					return resposne.send ({error: "action in progress"});
+				}
+				if (json._fn == "getNews") {
+					json.progress = 1;
+					data = JSON.stringify (json);
+				}
 			}
 			let resData, reqErr;
 			let req = http.request ({
