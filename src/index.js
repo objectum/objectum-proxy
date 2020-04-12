@@ -55,21 +55,19 @@ export default class Proxy {
 		
 		try {
 			let store = await me.getStore (opts.sid);
-			let progressId = `${opts.id ? opts.id : opts._model}-${opts._method}`;
 			
 			opts.store = store;
 			opts.progress = ({label, value, max}) => {
 				me.progress [opts.sid] = me.progress [opts.sid] || {};
-				me.progress [opts.sid][progressId] = me.progress [opts.sid][progressId] || {};
 				
 				if (label) {
-					me.progress [opts.sid][progressId].label = label;
+					me.progress [opts.sid].label = label;
 				}
 				if (value) {
-					me.progress [opts.sid][progressId].value = value;
+					me.progress [opts.sid].value = value;
 				}
 				if (max) {
-					me.progress [opts.sid][progressId].max = max;
+					me.progress [opts.sid].max = max;
 				}
 			};
 			if (opts.id) {
@@ -80,11 +78,8 @@ export default class Proxy {
 				}
 				let result = await record [opts._method] (opts);
 				
-				delete me.progress [opts.sid][progressId];
+				delete me.progress [opts.sid];
 				
-				if (!Object.keys (me.progress [opts.sid]).length) {
-					delete me.progress [opts.sid];
-				}
 				return {result};
 			} else {
 				let Model = store.registered [opts._model];
@@ -97,11 +92,8 @@ export default class Proxy {
 				}
 				let result = await Model [opts._method] (opts);
 				
-				delete me.progress [opts.sid][progressId];
+				delete me.progress [opts.sid];
 				
-				if (!Object.keys (me.progress [opts.sid]).length) {
-					delete me.progress [opts.sid];
-				}
 				return {result};
 			}
 		} catch (err) {
