@@ -315,7 +315,7 @@ export default class Proxy {
 		me.app.use (`${path}/upload`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
-				return `/projects/${config.code}/upload${req.url}`;
+				return `/projects/${config.code}/upload?sessionId=${req.query.sessionId}`;
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
