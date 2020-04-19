@@ -319,10 +319,12 @@ export default class Proxy {
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
-		me.app.use (`${path}/files`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
+		me.app.use (`${path}/files/*`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
-				return `/projects/${config.code}${req.url}`;
+				let tokens = req.baseUrl.split ("/");
+				
+				return `/projects/${config.code}/files/${tokens [tokens.length - 1]}`;
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
