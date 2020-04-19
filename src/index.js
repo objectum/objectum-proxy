@@ -47,6 +47,8 @@ export default class Proxy {
 			}
 			me.pool [sid] = store;
 		}
+		store.map.record = {};
+		
 		return store;
 	}
 	
