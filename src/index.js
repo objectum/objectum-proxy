@@ -319,6 +319,13 @@ export default class Proxy {
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
+		me.app.use (`${path}/files`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
+			parseReqBody: false,
+			proxyReqPathResolver: function (req) {
+				return `/projects/${config.code}${req.url}`;
+			},
+			proxyErrorHandler: me.proxyErrorHandler
+		}));
 		me.app.post (path, (req, res) => {
 			me.api (req, res);
 		});
