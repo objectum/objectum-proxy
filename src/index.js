@@ -3,7 +3,7 @@ import http from "http";
 import express from "express";
 import expressProxy from "express-http-proxy";
 import objectumClient from "objectum-client";
-const {Store} = objectumClient;
+const {Store, execute, factory} = objectumClient;
 
 export default class Proxy {
 	constructor () {
@@ -177,6 +177,97 @@ export default class Proxy {
 		return filters;
 	}
 	
+	async access ({data, resData, sid}) {
+		let me = this;
+		
+		if (data._rsc != "record") {
+			return true;
+		}
+		let store = await me.getStore (sid), model, id;
+		
+		if (store.username == "admin") {
+			return true;
+		}
+		try {
+			if (resData) {
+				if (data._fn == "get") {
+					resData = JSON.parse (resData);
+					model = store.getModel (resData._model);
+					
+					let record = factory ({rsc: "record", data: resData, store});
+					
+					if (me.Access && me.Access._accessRead) {
+						if (!(await execute (me.Access._accessRead, {store, model, record}))) {
+							return false;
+						}
+					}
+					if (record._accessRead) {
+						if (!(await execute (record._accessRead))) {
+							return false;
+						}
+					}
+				}
+			} else
+			if (data._fn == "create") {
+				model = store.getModel (data._model);
+				
+				if (!model) {
+					return true;
+				}
+				let regModel = me.registered [model.getPath ()];
+				
+				if (me.Access && me.Access._accessCreate) {
+					if (!(await execute (me.Access._accessCreate, {store, model, data}))) {
+						return false;
+					}
+				}
+				if (regModel && regModel._accessCreate) {
+					if (!(await execute (regModel._accessCreate, {store, model, data}))) {
+						return false;
+					}
+				}
+			} else {
+				let record = await store.getRecord (data.id);
+				
+				if (!record) {
+					return true;
+				}
+				id = record.id;
+				
+				let model = store.getModel (record._model);
+				
+				if (data._fn == "set") {
+					if (me.Access && me.Access._accessUpdate) {
+						if (!(await execute (me.Access._accessUpdate, {store, model, record, data}))) {
+							return false;
+						}
+					}
+					if (record._accessUpdate) {
+						if (!(await execute (record._accessUpdate))) {
+							return false;
+						}
+					}
+				}
+				if (data._fn == "remove") {
+					if (me.Access && me.Access._accessDelete) {
+						if (!(await execute (me.Access._accessDelete, {store, model, record}))) {
+							return false;
+						}
+					}
+					if (record._accessDelete) {
+						if (!(await execute (record._accessDelete))) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+			
+		} catch (err) {
+			throw new Error (`access function error: ${err.message},${model ? ` model: ${model.getPath ()},` : ""}${id ? ` record: ${id},` : ""} fn: ${data._fn}, stack: ${err.stack.split ("\\n")}`);
+		}
+	}
+	
 	async api (request, response) {
 		let me = this;
 		let data;
@@ -222,6 +313,16 @@ export default class Proxy {
 					console.error (err);
 					return response.send ({error: err.message});
 				}
+			}
+			if (json.hasOwnProperty ("_rsc") && json._rsc != "record") {
+				let store = await me.getStore (request.query.sid);
+				
+				if (store.username != "admin") {
+					return response.send ({error: "forbidden"});
+				}
+			}
+			if (!(await me.access ({data: json, sid: request.query.sid}))) {
+				return response.send ({error: "forbidden"});
 			}
 			if (me.progress [request.query.sid]) {
 				if (json._fn == "startTransaction") {
@@ -279,7 +380,11 @@ export default class Proxy {
 						if ((json._rsc == "model" || json._rsc == "query") && (json._fn == "create" || json._fn == "set")) {
 							await me.store.load ();
 						}
-						response.send (resData);
+						if (await me.access ({data: json, resData, sid: request.query.sid})) {
+							response.send (resData);
+						} else {
+							response.send ({error: "forbidden"});
+						}
 					}
 				});
 			});
@@ -297,7 +402,11 @@ export default class Proxy {
 	}
 	
 	register (path, Cls) {
-		this.registered [path] = Cls;
+		if (Cls) {
+			this.registered [path] = Cls;
+		} else {
+			this.Access = path;
+		}
 	}
 	
 	start ({config, path, __dirname}) {
