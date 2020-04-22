@@ -475,6 +475,9 @@ export default class Proxy {
 			me.api (req, res);
 		});
 		me.app.use (express.static (_path.join (__dirname, "build")));
+		me.app.get ("/files/*", function (req, res) {
+			res.sendFile (`${__dirname}/public${decodeURI (req.url)}`);
+		});
 		me.app.get ("/*", function (req, res) {
 			res.sendFile (_path.join (__dirname, "build", "index.html"));
 		});
