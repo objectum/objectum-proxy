@@ -4,6 +4,7 @@ import express from "express";
 import expressProxy from "express-http-proxy";
 import formidable from "formidable";
 import objectumClient from "objectum-client";
+import fs from "fs";
 const {Store, execute, factory} = objectumClient;
 
 export default class Proxy {
@@ -441,8 +442,21 @@ export default class Proxy {
 				if (err) {
 					res.send ({error: err.message});
 				} else {
-					console.log (fields, files, Object.keys (files));
-					res.send ({success: true});
+					let name = fields.name;
+					let path = files ["file"].path;
+					
+					if (name) {
+						let filename = `${__dirname}/public/files/${fields.objectId}-${fields.classAttrId}-${name}`;
+						
+						fs.rename (path, filename, function (err) {
+							if (err) {
+								return res.send ({error: err.message});
+							}
+							res.send ({success: true});
+						});
+					} else {
+						res.send ({error: "upload error"});
+					}
 				}
 			});
 		});
