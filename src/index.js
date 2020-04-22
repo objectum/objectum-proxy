@@ -2,6 +2,7 @@ import _path from "path";
 import http from "http";
 import express from "express";
 import expressProxy from "express-http-proxy";
+import formidable from "formidable";
 import objectumClient from "objectum-client";
 const {Store, execute, factory} = objectumClient;
 
@@ -423,14 +424,30 @@ export default class Proxy {
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
+/*
 		me.app.use (`${path}/upload`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
-				return `/projects/${config.code}/upload?sessionId=${req.query.sessionId}`;
+				return `/projects/${config.code}/upload?sid=${req.query.sid}`;
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
-		me.app.use (`${path}/files/*`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
+*/
+		me.app.post (`${path}/upload`, (req, res) => {
+			const form = formidable ({
+				uploadDir: `${__dirname}/public/files`
+			});
+			form.parse (req, (err, fields, files) => {
+				if (err) {
+					res.send ({error: err.message});
+				} else {
+					console.log (fields, files, Object.keys (files));
+					res.send ({success: true});
+				}
+			});
+		});
+/*
+		me.app.use (`${path}/files/!*`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
 				let tokens = req.baseUrl.split ("/");
@@ -439,6 +456,7 @@ export default class Proxy {
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
+*/
 		me.app.post (path, (req, res) => {
 			me.api (req, res);
 		});
