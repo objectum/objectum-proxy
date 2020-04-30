@@ -430,7 +430,7 @@ export default class Proxy {
 		this.registered [this.adminModel] = methods;
 	}
 	
-	start ({config, path, __dirname}) {
+	async start ({config, path, __dirname}) {
 		let me = this;
 		
 		me.config = config;
@@ -444,15 +444,6 @@ export default class Proxy {
 			},
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
-/*
-		me.app.use (`${path}/upload`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
-			parseReqBody: false,
-			proxyReqPathResolver: function (req) {
-				return `/projects/${config.code}/upload?sid=${req.query.sid}`;
-			},
-			proxyErrorHandler: me.proxyErrorHandler
-		}));
-*/
 		me.app.post (`${path}/upload`, (req, res) => {
 			const form = formidable ({
 				uploadDir: `${__dirname}/public/files`
@@ -479,17 +470,6 @@ export default class Proxy {
 				}
 			});
 		});
-/*
-		me.app.use (`${path}/files/!*`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
-			parseReqBody: false,
-			proxyReqPathResolver: function (req) {
-				let tokens = req.baseUrl.split ("/");
-				
-				return `/projects/${config.code}/files/${tokens [tokens.length - 1]}`;
-			},
-			proxyErrorHandler: me.proxyErrorHandler
-		}));
-*/
 		me.app.post (path, (req, res) => {
 			me.api (req, res);
 		});
@@ -503,18 +483,19 @@ export default class Proxy {
 		// admin methods
 		me.adminStore = new Store ();
 		me.adminStore.setUrl (`http://${config.objectum.host}:${config.objectum.port}/projects/${config.database.db}/`);
-		me.adminStore.auth ({
+		
+		await me.adminStore.auth ({
 			username: "admin",
 			password: config.adminPassword
-		}).then (() => {
-			for (let path in me.registered) {
-				me.adminStore.register (path, me.registered [path]);
-			}
-			me.app.listen (config.port, function () {
-				console.log (`server listening on port ${config.port}`);
-			});
-		}).catch (err => {
-			console.log (err);
+		});
+		for (let path in me.registered) {
+			me.adminStore.register (path, me.registered [path]);
+		}
+		if (me.Access && me.Access._init) {
+			await execute (me.Access._init, {store: me.adminStore});
+		}
+		me.app.listen (config.port, function () {
+			console.log (`server listening on port ${config.port}`);
 		});
 	}
 };
