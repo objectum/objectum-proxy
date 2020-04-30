@@ -1,6 +1,6 @@
 {
   "name": "objectum-proxy",
-  "version": "0.1.35",
+  "version": "0.1.36",
   "description": "objectum-proxy",
   "main": "lib/index.js",
   "module": "es/index.js",

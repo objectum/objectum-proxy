@@ -500,6 +500,9 @@ export default class Proxy {
 			username: "admin",
 			password: config.adminPassword
 		}).then (() => {
+			for (let path in me.registered) {
+				me.adminStore.register (path, me.registered [path]);
+			}
 			me.app.listen (config.port, function () {
 				console.log (`server listening on port ${config.port}`);
 			});
