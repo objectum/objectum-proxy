@@ -60,6 +60,9 @@ export default class Proxy {
 		try {
 			let store = await me.getStore (opts.sid);
 			
+			if (opts._model == me.adminModel) {
+				store = me.adminStore;
+			}
 			opts.store = store;
 			opts.progress = ({label, value, max}) => {
 				me.progress [opts.sid] = me.progress [opts.sid] || {};
@@ -411,6 +414,15 @@ export default class Proxy {
 		}
 	}
 	
+	registerAccessMethods (methods) {
+		this.Access = methods;
+	}
+	
+	registerAdminMethods (methods, model = "admin") {
+		this.adminModel = model;
+		this.registered [this.adminModel] = methods;
+	}
+	
 	start ({config, path, __dirname}) {
 		let me = this;
 		
@@ -481,8 +493,18 @@ export default class Proxy {
 		me.app.get ("/*", function (req, res) {
 			res.sendFile (_path.join (__dirname, "build", "index.html"));
 		});
-		me.app.listen (config.port, function () {
-			console.log (`server listening on port ${config.port}`);
+		// admin methods
+		me.adminStore = new Store ();
+		me.adminStore.setUrl (`http://${config.objectum.host}:${config.objectum.port}/projects/${config.database.db}/`);
+		me.adminStore.auth ({
+			username: "admin",
+			password: config.adminPassword
+		}).then (() => {
+			me.app.listen (config.port, function () {
+				console.log (`server listening on port ${config.port}`);
+			});
+		}).catch (err => {
+			console.log (err);
 		});
 	}
 };
