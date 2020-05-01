@@ -176,7 +176,8 @@ export default class Proxy {
 					}
 				}
 			} catch (err) {
-				throw new Error (`_accessFilter.query: ${opts.query}, error: ${err.message}`);
+				console.error (err);
+				throw new Error (`_accessFilter.query: ${opts.query}, error: ${err.message}, stack:  ${err.stack.split ("\n")}`);
 			}
 		}
 		return filters;
