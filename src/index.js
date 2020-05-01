@@ -390,9 +390,11 @@ export default class Proxy {
 							d.progress = me.progress [request.query.sid];
 							resData = JSON.stringify (d);
 						}
+/*
 						if ((json._rsc == "model" || json._rsc == "query") && (json._fn == "create" || json._fn == "set")) {
 							await me.store.load ();
 						}
+*/
 						if (await me.access ({data: json, resData, sid: request.query.sid})) {
 							response.send (resData);
 						} else {
