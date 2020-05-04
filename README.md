@@ -51,7 +51,7 @@ proxy.start ({config, path: "/api", __dirname});
 <a name="modelServerMethods" />
 
 ## Model server methods
-Methods are executed by current user.  
+Methods are executed by current user session.  
 ItemModel.js:
 ```js
 import {Record, isServer} from "objectum-client";
@@ -95,7 +95,7 @@ store.register ("item", ItemModel);
 <a name="adminMethods" />
 
 ## Admin methods
-Methods are executed by "admin".  
+Methods are executed by "admin" session.  
 admin.js:
 ```js
 async function register ({email, password, store}) {
