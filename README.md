@@ -15,6 +15,7 @@ npm install --save objectum-proxy
 
 ## API
 * [Initialization](#init)  
+* [Configuration](#configuration)  
 * [Model server methods](#modelServerMethods)
 * [Admin methods](#adminMethods)
 * [Access methods](#accessMethods)
@@ -46,6 +47,31 @@ proxy.registerAdminMethods (adminMethods);
 proxy.registerAccessMethods (accessMethods);
 
 proxy.start ({config, path: "/api", __dirname});
+```
+
+<a name="configuration" />
+
+## Configuration
+```js
+{
+    "code": "catalog",
+    "rootDir": "/opt/objectum/projects/catalog",
+    "adminPassword": "D033E22AE348AEB5660FC2140AEC35850C4DA997",
+    "port": 3100,
+    "database": {
+        "host": "localhost",
+        "port": 5432,
+        "db": "catalog",
+        "dbUser": "catalog",
+        "dbPassword": "1",
+        "dbaUser": "postgres",
+        "dbaPassword": "12345"
+    },
+    "objectum": {
+        "host": "localhost",
+        "port": 8200
+    }
+}
 ```
 
 <a name="modelServerMethods" />
