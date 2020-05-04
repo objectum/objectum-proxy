@@ -73,6 +73,7 @@ class ItemModel extends Record {
             return await store.remote ({
                 model: "item",
                 method: "myMethod",
+                id: this.id,
                 myArg
             });
         }
