@@ -52,6 +52,7 @@ proxy.start ({config, path: "/api", __dirname});
 <a name="configuration" />
 
 ## Configuration
+config.js:
 ```js
 {
     "code": "catalog",
