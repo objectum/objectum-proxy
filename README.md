@@ -58,24 +58,24 @@ import {Record, isServer} from "objectum-client";
 
 class ItemModel extends Record {
     static async myStaticMethod ({store, myArg}) {
-		if (!isServer ()) {
-			return await store.remote ({
-				model: "item",
-				method: "myStaticMethod",
+        if (!isServer ()) {
+            return await store.remote ({
+                model: "item",
+                method: "myStaticMethod",
                 myArg
-			});
-		}
+            });
+        }
         return arg1 * 2;
     }
 
     async myMethod ({myArg}) {
-		if (!isServer ()) {
-			return await store.remote ({
-				model: "item",
-				method: "myMethod",
+        if (!isServer ()) {
+            return await store.remote ({
+                model: "item",
+                method: "myMethod",
                 myArg
-			});
-		}
+            });
+        }
         const record = await this.store.getRecord (myArg);
  
         return this.myProperty + record.myAnotherProperty;
@@ -102,7 +102,7 @@ async function register ({email, password, store}) {
     // ...
 }
 export default {
-	register
+    register
 };
 ```
 Client:
@@ -122,86 +122,86 @@ Example for role "guest". access.js:
 ```js
 let roleMap = {};
 let map = {
-	"guest": {
-		"data": {
-			"org": true
-		},
-		"read": {
-			"objectum.role": true, "objectum.user": true, "org": true, "t.org.photo": true
-		}
-	}
+    "guest": {
+        "data": {
+            "org": true
+        },
+        "read": {
+            "objectum.role": true, "objectum.user": true, "org": true, "t.org.photo": true
+        }
+    }
 };
 // Module initialization
 async function _init ({store}) {
-	let roleRecs = await store.getRecs ({model: "objectum.role"});
-	
-	roleRecs.forEach (rec => roleMap [rec.id] = rec);
+    let roleRecs = await store.getRecs ({model: "objectum.role"});
+    
+    roleRecs.forEach (rec => roleMap [rec.id] = rec);
 };
 // Access to store.getData
 function _accessData ({store, data}) {
-	let role = roleMap [store.roleId].code;
-	
-	if (role == "guest") {
-		return map.guest.data [data.model];
-	}
-	return true;
+    let role = roleMap [store.roleId].code;
+    
+    if (role == "guest") {
+        return map.guest.data [data.model];
+    }
+    return true;
 };
 // Access to store.getData. Executed for all models in query
 function _accessFilter ({store, model, alias}) {
-	let role = roleMap [store.roleId].code;
+    let role = roleMap [store.roleId].code;
     let userRecord = await store.getRecord (store.userId); 
-	
-	if (role == "myRole" && model.getPath () == "t.org.photo") {
+    
+    if (role == "myRole" && model.getPath () == "t.org.photo") {
         // Show only photos from user organization
-		return [{[alias]: "org"}, "=", userRecord.org];
-	}
-	return;
+        return [{[alias]: "org"}, "=", userRecord.org];
+    }
+    return;
 };
 // Access to store.createRecord
 function _accessCreate ({store, model, data}) {
-	let role = roleMap [store.roleId].code;
-	
-	if (role == "guest") {
-		return false;
-	}
-	return true;
+    let role = roleMap [store.roleId].code;
+    
+    if (role == "guest") {
+        return false;
+    }
+    return true;
 };
 // Access to store.getRecord
 function _accessRead ({store, model, record}) {
-	let role = roleMap [store.roleId].code;
-	let modelPath = model.getPath ();
-	
-	if (role == "guest") {
-		return map.guest.read [modelPath];
-	}
-	return true;
+    let role = roleMap [store.roleId].code;
+    let modelPath = model.getPath ();
+    
+    if (role == "guest") {
+        return map.guest.read [modelPath];
+    }
+    return true;
 };
 // Access to store.updateRecord
 function _accessUpdate ({store, model, record, data}) {
-	let role = roleMap [store.roleId].code;
-	
-	if (role == "guest") {
-		return false;
-	}
-	return true;
+    let role = roleMap [store.roleId].code;
+    
+    if (role == "guest") {
+        return false;
+    }
+    return true;
 };
 // Access to store.removeRecord
 function _accessDelete ({store, model, record}) {
-	let role = roleMap [store.roleId].code;
-	
-	if (role == "guest") {
-		return false;
-	}
-	return true;
+    let role = roleMap [store.roleId].code;
+    
+    if (role == "guest") {
+        return false;
+    }
+    return true;
 };
 
 export default {
-	_init,
-	_accessData,
-	_accessFilter,
-	_accessCreate,
-	_accessRead,
-	_accessUpdate,
-	_accessDelete
+    _init,
+    _accessData,
+    _accessFilter,
+    _accessCreate,
+    _accessRead,
+    _accessUpdate,
+    _accessDelete
 };
 ```
