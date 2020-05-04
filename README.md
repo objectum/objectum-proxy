@@ -233,3 +233,14 @@ export default {
     _accessDelete
 };
 ```
+
+## Author
+
+**Dmitriy Samortsev**
+
++ http://github.com/objectum
+
+
+## Copyright and license
+
+MIT
