@@ -433,13 +433,16 @@ export default class Proxy {
 		this.registered [this.adminModel] = methods;
 	}
 	
-	async start ({config, path, __dirname}) {
+	async start ({config, path, __dirname, onInit}) {
 		let me = this;
 		
 		me.config = config;
 		
 		me.app = express ();
 		
+		if (onInit) {
+			onInit ({app: me.app});
+		}
 		me.app.use (`${path}/public`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
 			proxyReqPathResolver: function (req) {
