@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "express-http-proxy": "^1.6.0",
     "formidable": "^1.2.2",
-    "objectum-client": "^1.1.90"
+    "objectum-client": "^1.1.96"
   },
   "devDependencies": {
     "nwb": "0.23.x"

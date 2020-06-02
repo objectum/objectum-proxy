@@ -4,13 +4,14 @@ Reverse proxy for objectum platform https://github.com/objectum/objectum
 Objectum ecosystem:
 * Javascript platform https://github.com/objectum/objectum  
 * Isomorhic javascript client https://github.com/objectum/objectum-client  
+* Proxy for server methods and access control https://github.com/objectum/objectum-proxy  
 * React components https://github.com/objectum/objectum-react  
 * Command-line interface (CLI) https://github.com/objectum/objectum-cli  
 * Objectum project example https://github.com/objectum/catalog 
 
 ## Install
 ```bash
-npm install --save objectum-proxy
+npm install objectum-proxy
 ```
 
 ## API
@@ -53,7 +54,7 @@ proxy.start ({config, path: "/api", __dirname});
 
 ## Configuration
 config.js:
-```js
+```json
 {
     "code": "catalog",
     "rootDir": "/opt/objectum/projects/catalog",
@@ -95,7 +96,7 @@ class ItemModel extends Record {
         return arg1 * 2;
     }
 
-    async myMethod ({myArg}) {
+    async myMethod ({store, progress, myArg}) {
         if (!isServer ()) {
             return await store.remote ({
                 model: "item",
@@ -103,6 +104,11 @@ class ItemModel extends Record {
                 id: this.id,
                 myArg
             });
+        }
+        // show progress on client side
+        for (let i = 0; i < 10; i ++) {
+            await timeout (1000);
+            progress ({label: "processing", value: i + 1, max: 10});
         }
         const record = await this.store.getRecord (myArg);
  
