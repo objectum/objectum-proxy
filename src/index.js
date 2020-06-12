@@ -5,7 +5,16 @@ import expressProxy from "express-http-proxy";
 import formidable from "formidable";
 import objectumClient from "objectum-client";
 import fs from "fs";
+import office from "./office";
+const {
+	initOffice,
+	register,
+	activation,
+	recoverRequest,
+	recover
+} = office;
 const {Store, execute, factory} = objectumClient;
+
 
 export default class Proxy {
 	constructor () {
@@ -426,6 +435,19 @@ export default class Proxy {
 	
 	registerAccessMethods (methods) {
 		this.Access = methods;
+	}
+	
+	registerOfficeMethods ({role, secret, secretKey}) {
+		let am = this.registered [this.adminModel] = this.registered [this.adminModel] || {};
+		
+		initOffice ({role, smtp: this.config.smtp, secret, secretKey});
+		
+		Object.assign (am, {
+			register,
+			activation,
+			recoverRequest,
+			recover
+		});
 	}
 	
 	registerAdminMethods (methods, model = "admin") {
