@@ -437,10 +437,10 @@ export default class Proxy {
 		this.Access = methods;
 	}
 	
-	registerOfficeMethods ({role, secret, secretKey}) {
+	registerOfficeMethods ({role, smtp, secret, secretKey}) {
 		let am = this.registered [this.adminModel] = this.registered [this.adminModel] || {};
 		
-		initOffice ({role, smtp: this.config.smtp, secret, secretKey});
+		initOffice ({role, smtp, secret, secretKey});
 		
 		Object.assign (am, {
 			register,
