@@ -99,13 +99,15 @@ async function register ({activationHost, email, password, name, subject, text, 
 	
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	
+	let url = `${activationHost}?activationId=${activationId}`;
+	
 	try {
 		let info = await transporter.sendMail ({
 			from: smtp.forceSender || smtp.sender,
 			to: email,
 			subject,
-			text: `${text} ${activationHost}/office?activationId=${activationId}`,
-			html: `${text} <a href="${activationHost}/office?activationId=${activationId}">${activationHost}/office?activationId=${activationId}</a>`
+			text: `${text} ${url}`,
+			html: `${text} <a href="${url}">${url}</a>`
 		});
 		console.log (`Message sent: ${info.messageId}`);
 		
@@ -152,7 +154,7 @@ async function recoverRequest ({activationHost, email, password, recaptchaRes, s
 		throw new Error ("no account");
 	}
 	let recoverId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
-	let url = `${activationHost}/office?email=${email}&recoverId=${recoverId}&newPassword=${password}`;
+	let url = `${activationHost}?email=${email}&recoverId=${recoverId}&newPassword=${password}`;
 	
 	transporter = transporter || nodemailer.createTransport (smtp);
 	
