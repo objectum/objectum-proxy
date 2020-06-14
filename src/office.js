@@ -77,17 +77,24 @@ async function register ({activationHost, email, password, name, subject, text, 
 	}
 	let activationId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
 	
-	await store.startTransaction (`user registering: ${email}`);
-	await store.createRecord ({
-		_model: "objectum.user",
-		name,
-		email,
-		login: activationId,
-		password,
-		role: roleId
+	userRecs = await store.getRecs ({
+		model: "objectum.user",
+		filters: [
+			["login", "=", activationId]
+		]
 	});
-	await store.commitTransaction ();
-	
+	if (!userRecs.length) {
+		await store.startTransaction (`user registering: ${email}`);
+		await store.createRecord ({
+			_model: "objectum.user",
+			name,
+			email,
+			login: activationId,
+			password,
+			role: roleId
+		});
+		await store.commitTransaction ();
+	}
 	transporter = transporter || nodemailer.createTransport (smtp);
 	
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
