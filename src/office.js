@@ -17,19 +17,13 @@ function initOffice (opts) {
 
 function checkRecaptcha (response) {
 	let resData, reqErr;
-	let data = JSON.stringify ({
-		secret: secretKey, response
-	});
+	
 	return new Promise ((resolve, reject) => {
 		let req = https.request ({
 			host: "www.google.com",
-			port: 80,
-			path: "/recaptcha/api/siteverify",
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json; charset=utf-8",
-				"Content-Length": Buffer.byteLength (data, "utf8")
-			}
+			port: 443,
+			path: `/recaptcha/api/siteverify?secret=${secretKey}&response=${response}`,
+			method: "GET"
 		}, function (res) {
 			res.setEncoding ("utf8");
 			
@@ -51,7 +45,7 @@ function checkRecaptcha (response) {
 			reqErr = err;
 			reject (err);
 		});
-		req.end (data);
+		req.end ();
 	});
 };
 
