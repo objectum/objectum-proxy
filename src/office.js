@@ -138,7 +138,7 @@ async function activation ({store, activationId}) {
 	return {login: record.login, password: record.password};
 };
 
-async function recoverRequest ({activationHost, email, password, recaptchaRes, store}) {
+async function recoverRequest ({activationHost, email, name, password, recaptchaRes, store}) {
 	let checkResult = await checkRecaptcha (recaptchaRes);
 	
 	if (!checkResult) {
@@ -156,6 +156,9 @@ async function recoverRequest ({activationHost, email, password, recaptchaRes, s
 	let recoverId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
 	let url = `${activationHost}?email=${email}&recoverId=${recoverId}&newPassword=${password}`;
 	
+	if (name) {
+		url += `&newName=${name}`;
+	}
 	transporter = transporter || nodemailer.createTransport (smtp);
 	
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -176,7 +179,7 @@ async function recoverRequest ({activationHost, email, password, recaptchaRes, s
 	}
 }
 
-async function recover ({email, recoverId, newPassword, store}) {
+async function recover ({email, recoverId, newPassword, newName, store}) {
 	let userRecords = await store.getRecords ({
 		model: "objectum.user",
 		filters: [
@@ -197,6 +200,9 @@ async function recover ({email, recoverId, newPassword, store}) {
 	
 	record.password = newPassword;
 	
+	if (newName) {
+		record.name = newName;
+	}
 	await record.sync ();
 	await store.commitTransaction ();
 	
