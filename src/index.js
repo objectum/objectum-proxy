@@ -5,6 +5,8 @@ import expressProxy from "express-http-proxy";
 import formidable from "formidable";
 import objectumClient from "objectum-client";
 import fs from "fs";
+import util from "util";
+import sharp from "sharp";
 import office from "./office";
 const {
 	initOffice,
@@ -14,7 +16,8 @@ const {
 	recover
 } = office;
 const {Store, execute, factory} = objectumClient;
-
+fs.renameAsync = util.promisify (fs.rename);
+fs.unlinkAsync = util.promisify (fs.unlink);
 
 export default class Proxy {
 	constructor () {
@@ -474,25 +477,64 @@ export default class Proxy {
 			const form = formidable ({
 				uploadDir: `${__dirname}/public/files`
 			});
-			form.parse (req, (err, fields, files) => {
+			form.parse (req, async (err, fields, files) => {
+				let name = fields.name;
+				let path = files ["file"].path;
+				let filename = `${__dirname}/public/files/${fields.objectId}-${fields.classAttrId}-${name}`;
+				
 				if (err) {
-					res.send ({error: err.message});
-				} else {
-					let name = fields.name;
-					let path = files ["file"].path;
+					return res.send ({error: err.message});
+				}
+				if (!name) {
+					return res.send ({error: "upload error"});
+				}
+				try {
+					let store = me.getStore (req.query.sid);
+					let property = store.getProperty (fields.classAttrId);
 					
-					if (name) {
-						let filename = `${__dirname}/public/files/${fields.objectId}-${fields.classAttrId}-${name}`;
-						
-						fs.rename (path, filename, function (err) {
-							if (err) {
-								return res.send ({error: err.message});
-							}
-							res.send ({success: true});
-						});
-					} else {
-						res.send ({error: "upload error"});
+					if (me.Access && me.Access._accessUpload) {
+						if (!(await execute (me.Access._accessUpload, {
+							store, path, property, recordId: fields.objectId
+						}))) {
+							throw new Error ("forbidden");
+						};
 					}
+					let opts = property.getOpts ();
+					
+					if (opts.image) {
+						if (opts.image.resize) {
+							let resize = opts.image.resize;
+							
+							if (resize.width && resize.height) {
+								await sharp (path).resize (resize.width, resize.height).toFile (path);
+							}
+						}
+						if (opts.image.thumbnail) {
+							let thumbnail = opts.image.thumbnail;
+
+							if (thumbnail.width && thumbnail.height && thumbnail.property) {
+								let model = store.getModel (property.model);
+								
+								property = model.properties [thumbnail.property];
+								
+								if (!property) {
+									throw new Error ("unknown thumbnail property: " + thumbnail.property);
+								}
+								let tnPath = `${__dirname}/public/files/${fields.objectId}-${property.id}-${name}`;
+								
+								await sharp (path).resize (thumbnail.width, thumbnail.height).toFile (tnPath);
+							}
+						}
+					}
+					await fs.renameAsync (path, filename);
+					
+					res.send ({success: true});
+				} catch (err) {
+					try {
+						await fs.unlinkAsync (path);
+					} catch (err) {
+					}
+					res.send ({error: err.message});
 				}
 			});
 		});
