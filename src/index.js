@@ -528,8 +528,12 @@ export default class Proxy {
 							
 							if (opts.image && opts.image.resize && opts.image.resize.width && opts.image.resize.height) {
 								let tnPath = `${__dirname}/public/files/${fields.objectId}-${property.id}-${name}`;
+								let record = await store.getRecord (fields.objectId);
 								
 								await sharp (path).resize (opts.image.resize.width, opts.image.resize.height).toFile (tnPath);
+								
+								record [image.thumbnail] = name;
+								await record.sync ();
 							}
 						}
 					}
