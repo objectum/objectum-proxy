@@ -313,6 +313,13 @@ export default class Proxy {
 			if (json._model && json._method) {
 				json.sid = request.query.sid;
 				
+				if (me.Access && me.Access._accessMethod) {
+					let store = await me.getStore (request.query.sid);
+					
+					if (!(await execute (me.Access._accessMethod, {store, data: json}))) {
+						return response.send ({error: "forbidden"});
+					}
+				}
 				let result = await me.execute (json);
 				
 				return response.send (result);
