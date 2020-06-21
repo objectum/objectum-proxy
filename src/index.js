@@ -496,7 +496,7 @@ export default class Proxy {
 					return res.send ({error: "upload error"});
 				}
 				try {
-					let store = me.getStore (req.query.sid);
+					let store = await me.getStore (req.query.sid);
 					let property = store.getProperty (fields.classAttrId);
 					
 					if (me.Access && me.Access._accessUpload) {
