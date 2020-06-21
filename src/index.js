@@ -509,27 +509,27 @@ export default class Proxy {
 					let opts = property.getOpts ();
 					
 					if (opts.image) {
-						if (opts.image.resize) {
-							let resize = opts.image.resize;
-							
-							if (resize.width && resize.height) {
-								await sharp (path).resize (resize.width, resize.height).toFile (path);
+						let image = opts.image;
+						
+						if (image.resize) {
+							if (image.resize.width && image.resize.height) {
+								await sharp (path).resize (image.resize.width, image.resize.height).toFile (path);
 							}
 						}
-						if (opts.image.thumbnail) {
-							let thumbnail = opts.image.thumbnail;
+						if (image.thumbnail) {
+							let model = store.getModel (property.model);
+							
+							property = model.properties [image.thumbnail];
 
-							if (thumbnail.width && thumbnail.height && thumbnail.property) {
-								let model = store.getModel (property.model);
-								
-								property = model.properties [thumbnail.property];
-								
-								if (!property) {
-									throw new Error ("unknown thumbnail property: " + thumbnail.property);
-								}
+							if (!property) {
+								throw new Error ("unknown thumbnail property: " + image.thumbnail);
+							}
+							opts = property.getOpts ();
+							
+							if (opts.image && opts.image.resize && opts.image.resize.width && opts.image.resize.height) {
 								let tnPath = `${__dirname}/public/files/${fields.objectId}-${property.id}-${name}`;
 								
-								await sharp (path).resize (thumbnail.width, thumbnail.height).toFile (tnPath);
+								await sharp (path).resize (opts.image.resize.width, opts.image.resize.height).toFile (tnPath);
 							}
 						}
 					}
