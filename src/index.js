@@ -353,8 +353,12 @@ export default class Proxy {
 					return response.send ({error: "forbidden"});
 				}
 			}
-			if (!(await me.access ({data: json, sid: request.query.sid}))) {
-				return response.send ({error: "forbidden"});
+			try {
+				if (!(await me.access ({data: json, sid: request.query.sid}))) {
+					return response.send ({error: "forbidden"});
+				}
+			} catch (err) {
+				return response.send ({error: err.message});
 			}
 			if (me.progress [request.query.sid]) {
 				if (json._fn == "startTransaction") {
@@ -414,10 +418,14 @@ export default class Proxy {
 							await me.store.load ();
 						}
 */
-						if (await me.access ({data: json, resData, sid: request.query.sid})) {
-							response.send (resData);
-						} else {
-							response.send ({error: "forbidden"});
+						try {
+							if (await me.access ({data: json, resData, sid: request.query.sid})) {
+								response.send (resData);
+							} else {
+								response.send ({error: "forbidden"});
+							}
+						} catch (err) {
+							return response.send ({error: err.message});
 						}
 					}
 				});
