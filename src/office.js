@@ -125,7 +125,7 @@ async function activation ({store, activationId}) {
 		]
 	});
 	if (!userRecords.length) {
-		throw new Error ("no account");
+		throw new Error ("No account");
 	}
 	await store.startTransaction ("account activation");
 	
@@ -151,7 +151,7 @@ async function recoverRequest ({activationHost, email, name, password, recaptcha
 		]
 	});
 	if (!userRecs.length) {
-		throw new Error ("no account");
+		throw new Error ("No account");
 	}
 	let recoverId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
 	let url = `${activationHost}?email=${email}&recoverId=${recoverId}&newPassword=${password}`;
@@ -187,7 +187,7 @@ async function recover ({email, recoverId, newPassword, newName, store}) {
 		]
 	});
 	if (!userRecords.length) {
-		throw new Error ("no account");
+		throw new Error ("No account");
 	}
 	let secretId = crypto.createHash ("sha1").update ("secret" + email).digest ("hex").toUpperCase ();
 	
