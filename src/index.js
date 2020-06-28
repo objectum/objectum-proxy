@@ -198,7 +198,7 @@ export default class Proxy {
 	async access ({data, resData, result, sid}) {
 		let me = this;
 		
-		if (data._rsc != "record") {
+		if (data._rsc != "record" && !(data._fn == "getData" && resData)) {
 			return true;
 		}
 		let store = await me.getStore (sid), model, id;
