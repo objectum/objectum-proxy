@@ -240,7 +240,7 @@ export default class Proxy {
 				if (data._fn == "getData" && me.Access && me.Access._accessDataAfter) {
 					resData = JSON.parse (resData);
 					
-					let data = await execute (me.Access._accessDataAfter, {store, data: resData});
+					let data = await execute (me.Access._accessDataAfter, {store, data, resData});
 					
 					if (typeof (data) === "boolean") {
 						return data;
