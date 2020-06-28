@@ -195,7 +195,7 @@ export default class Proxy {
 		return filters;
 	}
 	
-	async access ({data, resData, sid}) {
+	async access ({data, resData, result, sid}) {
 		let me = this;
 		
 		if (data._rsc != "record") {
@@ -208,6 +208,7 @@ export default class Proxy {
 		}
 		try {
 			if (resData) {
+/*
 				if (data._fn == "get") {
 					resData = JSON.parse (resData);
 					model = store.getModel (resData._model);
@@ -224,6 +225,28 @@ export default class Proxy {
 							return false;
 						}
 					}
+				}
+*/
+				if (data._fn == "get" && me.Access && me.Access._accessRead) {
+					resData = JSON.parse (resData);
+					model = store.getModel (resData._model);
+					
+					let record = factory ({rsc: "record", data: resData, store});
+					
+					if (!(await execute (me.Access._accessRead, {store, model, record}))) {
+						return false;
+					}
+				}
+				if (data._fn == "getData" && me.Access && me.Access._accessDataAfter) {
+					resData = JSON.parse (resData);
+					
+					let data = await execute (me.Access._accessDataAfter, {store, data: resData});
+					
+					if (typeof (data) === "boolean") {
+						return data;
+					}
+					result.data = data;
+					return true;
 				}
 			} else
 			if (data._fn == "create") {
@@ -419,8 +442,10 @@ export default class Proxy {
 						}
 */
 						try {
-							if (await me.access ({data: json, resData, sid: request.query.sid})) {
-								response.send (resData);
+							let result = {};
+							
+							if (await me.access ({data: json, resData, sid: request.query.sid, result})) {
+								response.send (result.data || resData);
 							} else {
 								response.send ({error: "forbidden"});
 							}
