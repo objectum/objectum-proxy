@@ -122,12 +122,12 @@ export default class Proxy {
 		}
 	}
 	
-	getFilter ({fn, store, alias}) {
+	getFilter ({fn, model, store, alias}) {
 		return new Promise ((resolve, reject) => {
 			let promise;
 			
 			try {
-				promise = fn ({store, alias});
+				promise = fn ({model, store, alias});
 			} catch (err) {
 				return reject (err);
 			}
@@ -153,6 +153,14 @@ export default class Proxy {
 					return filter;
 				}
 			}
+		} else {
+			if (me.Access && me.Access._accessFilter) {
+				let filter = await me.getFilter ({fn: me.Access._accessFilter, model: store.getModel (mid), store, alias});
+				
+				if (filter && filter.length) {
+					return filter;
+				}
+			}
 		}
 	}
 	
@@ -161,13 +169,6 @@ export default class Proxy {
 		let store = await me.getStore (opts.sid);
 		let filters = [];
 		
-		if (opts.model) {
-			let filter = await me.getModelFilter ({store, mid: opts.model, alias: "a"});
-			
-			if (filter && filter.length) {
-				filters.push (filter);
-			}
-		}
 		if (opts.query) {
 			try {
 				let query = store.getQuery (opts.query);
@@ -190,6 +191,13 @@ export default class Proxy {
 			} catch (err) {
 				console.error (err);
 				throw new Error (`_accessFilter.query: ${opts.query}, error: ${err.message}, stack:  ${err.stack.split ("\n")}`);
+			}
+		}
+		if (opts.model) {
+			let filter = await me.getModelFilter ({store, mid: opts.model, alias: "a"});
+			
+			if (filter && filter.length) {
+				filters.push (filter);
 			}
 		}
 		return filters;
