@@ -1,6 +1,6 @@
 {
   "name": "objectum-proxy",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "objectum-proxy",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -22,7 +22,7 @@
     "express-http-proxy": "^1.6.0",
     "formidable": "^1.2.2",
     "nodemailer": "^6.4.8",
-    "objectum-client": "^1.1.96",
+    "objectum-client": "^1.2.1",
     "sharp": "^0.25.4"
   },
   "devDependencies": {

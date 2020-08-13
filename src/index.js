@@ -354,6 +354,13 @@ export default class Proxy {
 				
 				return response.send (result);
 			}
+			if (json._fn == "abortAction") {
+				let store = await me.getStore (request.query.sid);
+				
+				store.abortAction ();
+				
+				return response.send ({success: true});
+			}
 			if (json._fn == "getData") {
 				if (me.Access && me.Access._accessData) {
 					let store = await me.getStore (request.query.sid);
