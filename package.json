@@ -22,7 +22,7 @@
     "express-http-proxy": "^1.6.0",
     "formidable": "^1.2.2",
     "nodemailer": "^6.4.8",
-    "objectum-client": "^1.2.3",
+    "objectum-client": "^1.2.11",
     "sharp": "^0.25.4"
   },
   "devDependencies": {
