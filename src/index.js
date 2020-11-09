@@ -291,7 +291,12 @@ export default class Proxy {
 						}
 					}
 					if (record._accessUpdate) {
+/*
 						if (!(await execute (record._accessUpdate))) {
+							return false;
+						}
+*/
+						if (!(await execute.call (record, record._accessUpdate))) {
 							return false;
 						}
 					}
@@ -303,7 +308,12 @@ export default class Proxy {
 						}
 					}
 					if (record._accessDelete) {
+/*
 						if (!(await execute (record._accessDelete))) {
+							return false;
+						}
+*/
+						if (!(await execute.call (record, record._accessDelete))) {
 							return false;
 						}
 					}
