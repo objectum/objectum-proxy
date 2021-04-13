@@ -1,13 +1,14 @@
 {
   "name": "objectum-proxy",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "objectum-proxy",
   "main": "lib/index.js",
-  "module": "src/index.js",
+  "module": "es/index.js",
   "files": [
     "es",
     "lib",
-    "umd"
+    "umd",
+    "src"
   ],
   "scripts": {
     "build": "nwb build-web-module",
