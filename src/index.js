@@ -139,6 +139,7 @@ export default class Proxy {
 		});
 	}
 	
+/*
 	async getModelFilter ({store, mid, alias}) {
 		let me = this;
 		let Model = store.registered [mid];
@@ -156,6 +157,30 @@ export default class Proxy {
 		} else {
 			if (me.Access && me.Access._accessFilter) {
 				let filter = await me.getFilter ({fn: me.Access._accessFilter, model: store.getModel (mid), store, alias});
+				
+				if (filter && filter.length) {
+					return filter;
+				}
+			}
+		}
+	}
+*/
+	
+	async getModelFilter ({store, mid, alias}) {
+		let Model = store.registered [mid];
+		
+		if (this.Access && this.Access._accessFilter) {
+			let filter = await this.getFilter ({fn: this.Access._accessFilter, model: store.getModel (mid), store, alias});
+			
+			if (filter && filter.length) {
+				return filter;
+			}
+		} else
+		if (Model) {
+			let fn = Model._accessFilter;
+			
+			if (typeof (fn) == "function") {
+				let filter = await me.getFilter ({fn, store, alias});
 				
 				if (filter && filter.length) {
 					return filter;
@@ -268,7 +293,7 @@ export default class Proxy {
 					if (!(await execute (me.Access._accessCreate, {store, model, data}))) {
 						return false;
 					}
-				}
+				} else
 				if (regModel && regModel._accessCreate) {
 					if (!(await execute (regModel._accessCreate, {store, model, data}))) {
 						return false;
@@ -289,7 +314,7 @@ export default class Proxy {
 						if (!(await execute (me.Access._accessUpdate, {store, model, record, data}))) {
 							return false;
 						}
-					}
+					} else
 					if (record._accessUpdate) {
 /*
 						if (!(await execute (record._accessUpdate))) {
@@ -306,7 +331,7 @@ export default class Proxy {
 						if (!(await execute (me.Access._accessDelete, {store, model, record}))) {
 							return false;
 						}
-					}
+					} else
 					if (record._accessDelete) {
 /*
 						if (!(await execute (record._accessDelete))) {
