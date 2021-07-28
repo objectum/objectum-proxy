@@ -138,7 +138,7 @@ async function activation ({store, activationId}) {
 	return {login: record.login, password: record.password};
 };
 
-async function recoverRequest ({activationHost, email, name, password, recaptchaRes, store}) {
+async function recoverRequest ({activationHost, email, name, password, subject, text, recaptchaRes, store}) {
 	let checkResult = await checkRecaptcha (recaptchaRes);
 	
 	if (!checkResult) {
@@ -167,7 +167,7 @@ async function recoverRequest ({activationHost, email, name, password, recaptcha
 		let info = await transporter.sendMail ({
 			from: smtp.forceSender || smtp.sender,
 			to: email,
-			subject: "Восстановление пароля пользователя в 'Навигатор в мире дошкольного образования'",
+			subject,
 			text: `${text} ${url}`,
 			html: `${text} <a href="${url}">${url}</a>`
 		});
