@@ -70,10 +70,12 @@ export default class Proxy {
 		let me = this;
 		
 		try {
-			let store = await me.getStore (opts.sid);
-			
+			let store;
+
 			if (opts._model == me.adminModel) {
 				store = me.adminStore;
+			} else {
+				store = await me.getStore (opts.sid);
 			}
 			opts.store = store;
 			opts.progress = ({label, value, max}) => {
