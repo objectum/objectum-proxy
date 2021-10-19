@@ -2,6 +2,7 @@ import _path from "path";
 import http from "http";
 import express from "express";
 import expressProxy from "express-http-proxy";
+const {createProxyMiddleware, responseInterceptor} = require ("http-proxy-middleware");
 import formidable from "formidable";
 import objectumClient from "objectum-client";
 import fs from "fs";
@@ -554,6 +555,30 @@ export default class Proxy {
 		
 		if (onInit) {
 			onInit ({app: me.app});
+		}
+		if (config.proxy) {
+			let opts = {
+				target: config.proxy.target,
+				changeOrigin: true
+			};
+			if (config.proxy.roles) {
+				opts.selfHandleResponse = true;
+				opts.onProxyRes = responseInterceptor (async (responseBuffer, proxyRes, req, res) => {
+					if (req.path == path && responseBuffer.length < 1000) {
+						const data = JSON.parse (responseBuffer.toString ("utf8"));
+
+						if (data.roleCode && data.sessionId && config.proxy.roles.indexOf (data.roleCode) == -1) {
+							return '{"error":"Access denied"}';
+						}
+					}
+					return responseBuffer;
+				});
+			}
+			me.app.use ("/", createProxyMiddleware (opts));
+
+			return me.app.listen (config.port, function () {
+				console.log (`server listening on port ${config.port}\nproxy: ${config.proxy.target}`);
+			});
 		}
 		me.app.use (`${path}/public`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
 			parseReqBody: false,
