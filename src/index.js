@@ -577,7 +577,7 @@ export default class Proxy {
 			me.app.use ("/", createProxyMiddleware (opts));
 
 			return me.app.listen (config.port, function () {
-				console.log (`server listening on port ${config.port}\nproxy: ${config.proxy.target}`);
+				console.log (`server listening on port ${config.port}`);
 			});
 		}
 		me.app.use (`${path}/public`, expressProxy (`http://${config.objectum.host}:${config.objectum.port}`, {
