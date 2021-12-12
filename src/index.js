@@ -360,8 +360,10 @@ export default class Proxy {
 		let query = request.url.split ("?") [1];
 
 		request.query = request.query || {};
-		request.query.sid = request.headers.authorization.split (" ") [1];
-		
+
+		if (request.headers.authorization) {
+			request.query.sid = request.headers.authorization.split (" ") [1];
+		}
 		request.on ("data", chunk => {
 			if (data) {
 				data = Buffer.concat ([data, chunk]);
