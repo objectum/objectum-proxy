@@ -455,10 +455,10 @@ export default class Proxy {
 				port: me.config.objectum.port,
 				path: `/projects/${me.config.database.db}/${query ? `?${query}` : ""}`,
 				method: "POST",
-				headers: {
+				headers: Object.assign ({}, request.headers, {
 					"Content-Type": "application/json; charset=utf-8",
 					"Content-Length": Buffer.byteLength (data, "utf8")
-				}
+				})
 			}, function (res) {
 				res.setEncoding ("utf8");
 				
