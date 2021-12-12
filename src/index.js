@@ -357,7 +357,10 @@ export default class Proxy {
 	async api (request, response) {
 		let me = this;
 		let data;
-		let query = request.url.split ("?")[1];
+		let query = request.url.split ("?") [1];
+
+		request.query = request.query || {};
+		request.query.sid = request.headers.authorization.split (" ") [1];
 		
 		request.on ("data", chunk => {
 			if (data) {
@@ -588,6 +591,9 @@ export default class Proxy {
 			proxyErrorHandler: me.proxyErrorHandler
 		}));
 		me.app.post (`${path}/upload`, (req, res) => {
+			req.query = req.query || {};
+			req.query.sid = req.headers.authorization.split (" ") [1];
+
 			const form = formidable ({
 				uploadDir: `${__dirname}/public/files`
 			});
