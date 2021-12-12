@@ -474,9 +474,9 @@ export default class Proxy {
 						if (json._fn == "auth") {
 							let d = JSON.parse (resData);
 							
-							if (d.sessionId) {
-								me.sessions [d.sessionId] = d;
-								me.sessions [d.sessionId].username = json.username;
+							if (d.accessToken) {
+								me.sessions [d.accessToken] = d;
+								me.sessions [d.accessToken].username = json.username;
 							}
 						}
 						if (json._trace) {
