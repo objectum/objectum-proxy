@@ -475,8 +475,13 @@ export default class Proxy {
 							let d = JSON.parse (resData);
 							
 							if (d.accessToken) {
-								me.sessions [d.accessToken] = d;
-								me.sessions [d.accessToken].username = json.username;
+								if (request.query.sid) {
+									me.sessions [d.accessToken] = Object.assign (me.sessions [request.query.sid], d);
+									delete me.sessions [request.query.sid];
+									delete me.pool [request.query.sid];
+								} else {
+									me.sessions [d.accessToken] = d;
+								}
 							}
 						}
 						if (json._trace) {
