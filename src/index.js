@@ -573,11 +573,15 @@ export default class Proxy {
 			if (config.proxy.roles) {
 				opts.selfHandleResponse = true;
 				opts.onProxyRes = responseInterceptor (async (responseBuffer, proxyRes, req, res) => {
-					if (req.path == path && responseBuffer.length < 1000) {
-						const data = JSON.parse (responseBuffer.toString ("utf8"));
+					if (req.method == "POST" && req.path == path && responseBuffer.length < 1500) {
+						try {
+							const data = JSON.parse (responseBuffer.toString ("utf8"));
 
-						if (data.roleCode && data.sessionId && config.proxy.roles.indexOf (data.roleCode) == -1) {
-							return '{"error":"Access denied"}';
+							if (data.roleCode && data.accessToken && config.proxy.roles.indexOf (data.roleCode) == -1) {
+								return '{"error":"Access denied"}';
+							}
+						} catch (err) {
+							console.error ("responseInterceptor error", err);
 						}
 					}
 					return responseBuffer;
