@@ -39,7 +39,7 @@ export default class Proxy {
 		let store = me.pool [sid];
 		
 		if (!store) {
-			store = new Store ();
+			store = new Store ({noInformer: true});
 			
 			store.setUrl (`http://${me.config.objectum.host}:${me.config.objectum.port}/projects/${me.config.database.db}/`);
 			store.setSessionId (sid);
