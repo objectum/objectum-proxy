@@ -51,7 +51,7 @@ export default class Proxy {
 			} else {
 				await store.load ();
 				
-				store.informer ();
+				//store.informer ();
 				
 				me.map = store.map;
 				me.dict = store.dict;

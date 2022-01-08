@@ -1,40 +1,40 @@
 {
-  "name": "objectum-proxy",
-  "version": "1.2.9",
-  "description": "objectum-proxy",
-  "main": "lib/index.js",
-  "module": "es/index.js",
-  "files": [
-    "es",
-    "lib",
-    "umd",
-    "src"
-  ],
-  "scripts": {
-    "build": "nwb build-web-module",
-    "clean": "nwb clean-module",
-    "prepublishOnly": "npm run build",
-    "test": "nwb test",
-    "test:coverage": "nwb test --coverage",
-    "test:watch": "nwb test --server"
-  },
-  "dependencies": {
-    "express": "^4.17.1",
-    "express-http-proxy": "^1.6.0",
-    "formidable": "^1.2.2",
-    "http-proxy-middleware": "^2.0.1",
-    "nodemailer": "^6.4.8",
-    "objectum-client": "^1.3.12",
-    "sharp": "^0.25.4"
-  },
-  "devDependencies": {
-    "nwb": "0.25.2"
-  },
-  "author": "Dmitriy Samortsev",
-  "homepage": "https://github.com/objectum/objectum-proxy#readme",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/objectum/objectum-proxy.git"
-  }
+    "name": "objectum-proxy",
+    "version": "1.2.10",
+    "description": "objectum-proxy",
+    "main": "lib/index.js",
+    "module": "es/index.js",
+    "files": [
+        "es",
+        "lib",
+        "umd",
+        "src"
+    ],
+    "scripts": {
+        "build": "nwb build-web-module",
+        "clean": "nwb clean-module",
+        "prepublishOnly": "npm run build",
+        "test": "nwb test",
+        "test:coverage": "nwb test --coverage",
+        "test:watch": "nwb test --server"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "express-http-proxy": "^1.6.0",
+        "formidable": "^1.2.2",
+        "http-proxy-middleware": "^2.0.1",
+        "nodemailer": "^6.4.8",
+        "objectum-client": "^1.3.13",
+        "sharp": "^0.25.4"
+    },
+    "devDependencies": {
+        "nwb": "0.25.2"
+    },
+    "author": "Dmitriy Samortsev",
+    "homepage": "https://github.com/objectum/objectum-proxy#readme",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/objectum/objectum-proxy.git"
+    }
 }
