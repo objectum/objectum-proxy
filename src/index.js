@@ -8,7 +8,9 @@ import objectumClient from "objectum-client";
 import fs from "fs";
 import util from "util";
 import sharp from "sharp";
+import compression from "compression";
 import office from "./office";
+
 const {
 	initOffice,
 	register,
@@ -555,13 +557,16 @@ export default class Proxy {
 		this.registered [this.adminModel] = methods;
 	}
 	
-	async start ({config, path, __dirname, onInit}) {
+	async start ({config, path, __dirname, onInit, compression}) {
 		let me = this;
 		
 		me.config = config;
 		
 		me.app = express ();
-		
+
+		if (compression) {
+			me.app.use (compression ());
+		}
 		if (onInit) {
 			onInit ({app: me.app});
 		}

@@ -1,6 +1,6 @@
 {
     "name": "objectum-proxy",
-    "version": "1.2.10",
+    "version": "1.2.11",
     "description": "objectum-proxy",
     "main": "lib/index.js",
     "module": "es/index.js",
@@ -19,6 +19,7 @@
         "test:watch": "nwb test --server"
     },
     "dependencies": {
+        "compression": "^1.7.4",
         "express": "^4.17.1",
         "express-http-proxy": "^1.6.0",
         "formidable": "^1.2.2",
