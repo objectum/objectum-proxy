@@ -557,14 +557,14 @@ export default class Proxy {
 		this.registered [this.adminModel] = methods;
 	}
 	
-	async start ({config, path, __dirname, onInit, compression}) {
+	async start ({config, path, __dirname, onInit, compression: _compression}) {
 		let me = this;
 		
 		me.config = config;
 		
 		me.app = express ();
 
-		if (compression) {
+		if (_compression) {
 			me.app.use (compression ());
 		}
 		if (onInit) {
