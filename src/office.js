@@ -6,13 +6,14 @@ import nodemailer from "nodemailer";
 import _ from "lodash";
 import https from "https";
 
-let smtp, transporter, role, roleId, secret, secretKey;
+let smtp, transporter, role, roleId, secret, secretKey, disableCheck;
 
 function initOffice (opts) {
 	smtp = opts.smtp;
 	role = opts.role;
 	secret = opts.secret;
 	secretKey = opts.secretKey;
+	disableCheck = opts.disableCheck;
 };
 
 function checkRecaptcha (response) {
@@ -50,10 +51,12 @@ function checkRecaptcha (response) {
 };
 
 async function register ({activationHost, email, password, name, subject, text, recaptchaRes, store}) {
-	let checkResult = await checkRecaptcha (recaptchaRes);
-	
-	if (!checkResult) {
-		throw new Error ("Invalid recaptcha response");
+	if (!disableCheck) {
+		let checkResult = await checkRecaptcha (recaptchaRes);
+
+		if (!checkResult) {
+			throw new Error ("Invalid recaptcha response");
+		}
 	}
 	let userRecs = await store.getRecs ({
 		model: "objectum.user",
@@ -139,10 +142,12 @@ async function activation ({store, activationId}) {
 };
 
 async function recoverRequest ({activationHost, email, name, password, subject, text, recaptchaRes, store}) {
-	let checkResult = await checkRecaptcha (recaptchaRes);
-	
-	if (!checkResult) {
-		throw new Error ("Invalid recaptcha response");
+	if (!disableCheck) {
+		let checkResult = await checkRecaptcha (recaptchaRes);
+
+		if (!checkResult) {
+			throw new Error ("Invalid recaptcha response");
+		}
 	}
 	let userRecs = await store.getRecs ({
 		model: "objectum.user",
