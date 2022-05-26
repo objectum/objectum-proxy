@@ -6,14 +6,14 @@ import nodemailer from "nodemailer";
 import _ from "lodash";
 import https from "https";
 
-let smtp, transporter, role, roleId, secret, secretKey, disableCheck;
+let smtp, transporter, role, roleId, secret, secretKey, disableRecaptchaCheck;
 
 function initOffice (opts) {
 	smtp = opts.smtp;
 	role = opts.role;
 	secret = opts.secret;
 	secretKey = opts.secretKey;
-	disableCheck = opts.disableCheck;
+	disableRecaptchaCheck = opts.disableRecaptchaCheck;
 };
 
 function checkRecaptcha (response) {
@@ -51,7 +51,7 @@ function checkRecaptcha (response) {
 };
 
 async function register ({activationHost, email, password, name, subject, text, recaptchaRes, store}) {
-	if (!disableCheck) {
+	if (!disableRecaptchaCheck) {
 		let checkResult = await checkRecaptcha (recaptchaRes);
 
 		if (!checkResult) {
@@ -142,7 +142,7 @@ async function activation ({store, activationId}) {
 };
 
 async function recoverRequest ({activationHost, email, name, password, subject, text, recaptchaRes, store}) {
-	if (!disableCheck) {
+	if (!disableRecaptchaCheck) {
 		let checkResult = await checkRecaptcha (recaptchaRes);
 
 		if (!checkResult) {

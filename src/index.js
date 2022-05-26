@@ -541,8 +541,8 @@ export default class Proxy {
 		this.Access = methods;
 	}
 	
-	getOfficeMethods ({role, smtp, secret, secretKey}) {
-		initOffice ({role, smtp, secret, secretKey});
+	getOfficeMethods ({role, smtp, secret, secretKey, disableRecaptchaCheck}) {
+		initOffice ({role, smtp, secret, secretKey, disableRecaptchaCheck});
 		
 		return {
 			register,
