@@ -557,7 +557,7 @@ export default class Proxy {
 		this.registered [this.adminModel] = methods;
 	}
 
-	async start ({config, path, __dirname, onInit, compression: _compression, maxFileSize}) {
+	async start ({config, path, __dirname, onInit, compression: _compression}) {
 		let me = this;
 
 		me.config = config;
