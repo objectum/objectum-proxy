@@ -610,10 +610,10 @@ export default class Proxy {
 			req.query.sid = req.headers.authorization.split (" ") [1];
 
 			const formidableOpts = {
-				uploadDir: `${__dirname}/public/files`
+				uploadDir: config.upload?.dir || `${__dirname}/public/files`
 			}
-			if (maxFileSize) {
-				formidableOpts.maxFileSize = maxFileSize
+			if (config.upload?.maxFileSize) {
+				formidableOpts.maxFileSize = config.upload?.maxFileSize
 			}
 			const form = formidable (formidableOpts);
 
