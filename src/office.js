@@ -18,7 +18,7 @@ function initOffice (opts) {
 
 function checkRecaptcha (response) {
 	let resData, reqErr;
-	
+
 	return new Promise ((resolve, reject) => {
 		let req = https.request ({
 			host: "www.google.com",
@@ -27,7 +27,7 @@ function checkRecaptcha (response) {
 			method: "GET"
 		}, function (res) {
 			res.setEncoding ("utf8");
-			
+
 			res.on ("data", function (d) {
 				if (resData) {
 					resData += d;
@@ -72,14 +72,14 @@ async function register ({activationHost, email, password, name, subject, text, 
 			model: "objectum.role"
 		});
 		roleId = _.find (roleRecs, {code: role});
-		
+
 		if (!roleId) {
 			throw new Error ("Unknown role");
 		}
 		roleId = roleId.id;
 	}
 	let activationId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
-	
+
 	userRecs = await store.getRecs ({
 		model: "objectum.user",
 		filters: [
@@ -99,11 +99,11 @@ async function register ({activationHost, email, password, name, subject, text, 
 		await store.commitTransaction ();
 	}
 	transporter = transporter || nodemailer.createTransport (smtp);
-	
+
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-	
+
 	let url = `${activationHost}?activationId=${activationId}`;
-	
+
 	try {
 		let info = await transporter.sendMail ({
 			from: smtp.forceSender || smtp.sender,
@@ -113,7 +113,7 @@ async function register ({activationHost, email, password, name, subject, text, 
 			html: `${text} <a href="${url}">${url}</a>`
 		});
 		console.log (`Message sent: ${info.messageId}`);
-		
+
 		return "email has been sent to you with instructions to activate your account";
 	} catch (err) {
 		throw new Error (err.message);
@@ -131,13 +131,13 @@ async function activation ({store, activationId}) {
 		throw new Error ("No account");
 	}
 	await store.startTransaction ("account activation");
-	
+
 	let record = userRecords [0];
 	record.login = record.email;
-	
+
 	await record.sync ();
 	await store.commitTransaction ();
-	
+
 	return {login: record.login, password: record.password};
 };
 
@@ -155,19 +155,32 @@ async function recoverRequest ({activationHost, email, name, password, subject, 
 			["login", "=", email]
 		]
 	});
+	let recoverId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
+
+	if (!userRecs.length) {
+		userRecs = await store.getRecs ({
+			model: "objectum.user",
+			filters: [
+				["login", "<>", recoverId],
+				["email", "=", email]
+			]
+		});
+	}
 	if (!userRecs.length) {
 		throw new Error ("No account");
 	}
-	let recoverId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
+	if (userRecs.length > 1) {
+		throw new Error (`Account error, count: ${userRecs.length}`);
+	}
 	let url = `${activationHost}?email=${email}&recoverId=${recoverId}&newPassword=${password}`;
-	
+
 	if (name) {
 		url += `&newName=${name}`;
 	}
 	transporter = transporter || nodemailer.createTransport (smtp);
-	
+
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-	
+
 	try {
 		let info = await transporter.sendMail ({
 			from: smtp.forceSender || smtp.sender,
@@ -177,7 +190,7 @@ async function recoverRequest ({activationHost, email, name, password, subject, 
 			html: `${text} <a href="${url}">${url}</a>`
 		});
 		console.log (`Message sent: ${info.messageId}`);
-		
+
 		return "a password recovery email has been sent to you";
 	} catch (err) {
 		throw new Error (err.message);
@@ -191,26 +204,38 @@ async function recover ({email, recoverId, newPassword, newName, store}) {
 			["login", "=", email]
 		]
 	});
+	let secretId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
+
+	if (!userRecords.length) {
+		userRecords = await store.getRecords ({
+			model: "objectum.user",
+			filters: [
+				["login", "<>", secretId],
+				["email", "=", email]
+			]
+		});
+	}
 	if (!userRecords.length) {
 		throw new Error ("No account");
 	}
-	let secretId = crypto.createHash ("sha1").update ("secret" + email).digest ("hex").toUpperCase ();
-	
+	if (userRecords.length > 1) {
+		throw new Error (`Account error, count: ${userRecords.length}`);
+	}
 	if (secretId != recoverId) {
 		throw new Error ("Invalid password recovery code");
 	}
 	await store.startTransaction ("password recovery");
-	
+
 	let record = userRecords [0];
-	
+
 	record.password = newPassword;
-	
+
 	if (newName) {
 		record.name = newName;
 	}
 	await record.sync ();
 	await store.commitTransaction ();
-	
+
 	return {login: record.login};
 }
 
