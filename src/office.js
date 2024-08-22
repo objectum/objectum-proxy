@@ -50,6 +50,18 @@ function checkRecaptcha (response) {
 	});
 };
 
+async function getRoleId({ store, role }) {
+	let roleRecs = await store.getRecs ({
+		model: "objectum.role"
+	});
+	roleId = _.find (roleRecs, {code: role});
+
+	if (!roleId) {
+		throw new Error ("Unknown role");
+	}
+	return roleId.id;
+}
+
 async function register ({activationHost, email, password, name, subject, text, recaptchaRes, store}) {
 	if (!disableRecaptchaCheck) {
 		let checkResult = await checkRecaptcha (recaptchaRes);
@@ -68,15 +80,7 @@ async function register ({activationHost, email, password, name, subject, text, 
 		throw new Error ("Account already exists");
 	}
 	if (!roleId) {
-		let roleRecs = await store.getRecs ({
-			model: "objectum.role"
-		});
-		roleId = _.find (roleRecs, {code: role});
-
-		if (!roleId) {
-			throw new Error ("Unknown role");
-		}
-		roleId = roleId.id;
+		roleId = await getRoleId({ store, role })
 	}
 	let activationId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
 
@@ -141,7 +145,7 @@ async function activation ({store, activationId}) {
 	return {login: record.login, password: record.password};
 };
 
-async function recoverRequest ({activationHost, email, name, password, subject, text, recaptchaRes, store}) {
+async function recoverRequest ({activationHost, email, name, password, subject, text, recaptchaRes, roleCode, store}) {
 	if (!disableRecaptchaCheck) {
 		let checkResult = await checkRecaptcha (recaptchaRes);
 
@@ -149,21 +153,29 @@ async function recoverRequest ({activationHost, email, name, password, subject, 
 			throw new Error ("Invalid recaptcha response");
 		}
 	}
+	let filters = [
+		["login", "=", email]
+	]
+	if (roleCode) {
+		filters.push(['role', '=', await getRoleId({ store, role: roleCode })])
+	}
 	let userRecs = await store.getRecs ({
 		model: "objectum.user",
-		filters: [
-			["login", "=", email]
-		]
+		filters
 	});
 	let recoverId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
 
 	if (!userRecs.length) {
+		let filters = [
+			["login", "<>", recoverId],
+			["email", "=", email]
+		]
+		if (roleCode) {
+			filters.push(['role', '=', await getRoleId({ store, role: roleCode })])
+		}
 		userRecs = await store.getRecs ({
 			model: "objectum.user",
-			filters: [
-				["login", "<>", recoverId],
-				["email", "=", email]
-			]
+			filters
 		});
 	}
 	if (!userRecs.length) {
@@ -197,22 +209,30 @@ async function recoverRequest ({activationHost, email, name, password, subject, 
 	}
 }
 
-async function recover ({email, recoverId, newPassword, newName, store}) {
+async function recover ({email, recoverId, newPassword, newName, roleCode, store}) {
+	let filters = [
+		["login", "=", email]
+	]
+	if (roleCode) {
+		filters.push(['role', '=', await getRoleId({ store, role: roleCode })])
+	}
 	let userRecords = await store.getRecords ({
 		model: "objectum.user",
-		filters: [
-			["login", "=", email]
-		]
+		filters
 	});
 	let secretId = crypto.createHash ("sha1").update (secret + email).digest ("hex").toUpperCase ();
 
 	if (!userRecords.length) {
+		let filters = [
+			["login", "<>", secretId],
+			["email", "=", email]
+		]
+		if (roleCode) {
+			filters.push(['role', '=', await getRoleId({ store, role: roleCode })])
+		}
 		userRecords = await store.getRecords ({
 			model: "objectum.user",
-			filters: [
-				["login", "<>", secretId],
-				["email", "=", email]
-			]
+			filters
 		});
 	}
 	if (!userRecords.length) {
