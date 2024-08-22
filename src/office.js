@@ -186,6 +186,9 @@ async function recoverRequest ({activationHost, email, name, password, subject, 
 	}
 	let url = `${activationHost}?email=${email}&recoverId=${recoverId}&newPassword=${password}`;
 
+	if (roleCode) {
+		url += `&roleCode=${roleCode}`
+	}
 	if (name) {
 		url += `&newName=${name}`;
 	}
