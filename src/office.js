@@ -51,15 +51,15 @@ function checkRecaptcha (response) {
 };
 
 async function getRoleId({ store, role }) {
-	let roleRecs = await store.getRecs ({
+	const roleRecs = await store.getRecs ({
 		model: "objectum.role"
-	});
-	roleId = _.find (roleRecs, {code: role});
+	})
+	const roleRec = roleRecs.find (roleRec => roleRec.code == role)
 
-	if (!roleId) {
+	if (!roleRec) {
 		throw new Error ("Unknown role");
 	}
-	return roleId.id;
+	return roleRec.id;
 }
 
 async function register ({activationHost, email, password, name, subject, text, recaptchaRes, store}) {
