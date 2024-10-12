@@ -70,6 +70,10 @@ async function register ({activationHost, email, password, name, subject, text, 
 			throw new Error ("Invalid recaptcha response");
 		}
 	}
+	try {
+		await store.rollbackTransaction ();
+	} catch(err) {
+	}
 	let userRecs = await store.getRecs ({
 		model: "objectum.user",
 		filters: [
